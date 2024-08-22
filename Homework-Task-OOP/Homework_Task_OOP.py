@@ -22,6 +22,7 @@ class PlayerSprite(pygame.sprite.Sprite):
         self.jump = False
         self.gravity = 1
         self.velocity = 12
+        self.current_scene = 0
 
     def update(self, pressed_keys):
 
@@ -47,11 +48,16 @@ class PlayerSprite(pygame.sprite.Sprite):
             
             # Keep player on the screen
         if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.right > screen_width:
             self.rect.right = screen_width
+            self.next_scene("Left")
+
+        if self.rect.right > screen_width:
+            self.rect.left = 0
+            self.next_scene("Right")
+
         if self.rect.top <= 0:
             self.rect.top = 0
+
         if self.rect.bottom >= screen_height/2:
             if self.jump:
                 print("jasndkjandskja")
@@ -62,6 +68,29 @@ class PlayerSprite(pygame.sprite.Sprite):
         elif not self.jump:
             self.rect.move_ip(0, self.gravity)
             self.gravity += 0.5
+
+    def next_scene(self, direction):
+        if direction == "Left":
+            if self.current_scene - 1 in world_dict:
+                self.current_scene -= 1
+                world_dict[self.current_scene]
+
+            else:
+                self.current_scene -= 1
+                block_list = []
+                block_list = generate_world(block_list)
+                world_dict[self.current_scene] = block_list
+
+        else:
+            if self.current_scene + 1 in world_dict:
+                self.current_scene += 1
+                world_dict[self.current_scene]
+
+            else:
+                self.current_scene += 1
+                block_list = []
+                block_list = generate_world(block_list)
+                world_dict[self.current_scene] = block_list
 
            
 
@@ -166,13 +195,18 @@ def generate_world(block_list: list):
     return block_list
 
             
+world_dict = {}
+
+
 clock = pygame.time.Clock()
 block_list = generate_world(block_list)
+
+world_dict[0] = block_list
 
 player = Player()
 running = True
 while running:
-    
+    print(world_dict.keys())
     clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -189,7 +223,7 @@ while running:
     player.update(pressed_keys)
     pygame.display.flip()
     screen.fill((50, 157, 168))
-    for block in block_list:
+    for block in world_dict[player.current_scene]:
         screen.blit(block.image, (block.x, block.y))
    
 pygame.quit()
