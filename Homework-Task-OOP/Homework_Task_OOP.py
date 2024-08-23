@@ -25,12 +25,9 @@ class PlayerSprite(pygame.sprite.Sprite):
         self.current_scene = 0
 
     def update(self, pressed_keys):
-
-        print(self.jump)
         if self.jump:
             self.rect.move_ip(0, -1*self.velocity)
             self.velocity -= self.gravity
-            print("here")
         
         
         elif pressed_keys[pygame.K_w] and not self.jump:
@@ -59,12 +56,11 @@ class PlayerSprite(pygame.sprite.Sprite):
             self.rect.top = 0
 
         if self.rect.bottom >= screen_height/2:
-            if self.jump:
-                print("jasndkjandskja")
             self.rect.bottom = screen_height/2
             self.jump = False
             self.gravity = 1
             self.velocity = 12
+            
         elif not self.jump:
             self.rect.move_ip(0, self.gravity)
             self.gravity += 0.5
@@ -93,9 +89,6 @@ class PlayerSprite(pygame.sprite.Sprite):
                 world_dict[self.current_scene] = block_list
 
            
-
-        
-            
 
 class Player(PlayerSprite):
     def __init__(self):
@@ -213,7 +206,9 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 running = False
             elif event.key == pygame.K_SPACE:
-                block_list = generate_world(block_list)
+                world_dict.clear()
+                world_dict[0] = generate_world(block_list)
+                player.current_scene = 0
         
         elif event.type == pygame.QUIT:
             running = False
